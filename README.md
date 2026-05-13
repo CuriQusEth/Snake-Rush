@@ -1,20 +1,33 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Snake Rush
 
-# Run and deploy your AI Studio app
+Snake Rush is a fast, intense, and modern reimagining of the classic Snake game, built with on-chain mechanics and agent integrations. Play, survive, and record your rushes.
 
-This contains everything you need to run your app locally.
+## Overview
+Control a high-speed neon snake rushing through dynamic arenas. Eat energy orbs, dodge hazards, and survive as long as possible while building massive combos. The game accelerates continuously—true to the "Rush" name.
 
-View your app in AI Studio: https://ai.studio/apps/b8813a12-68cf-4771-bcf9-5dfc60437e6e
+## Features
+- **High-Speed Gameplay**: The longer you survive, the faster your snake becomes.
+- **On-Chain Leaderboards**: Track your highest score and longest survival.
+- **ERC-8004 Agent Orchestration**: Features a `.well-known/agent-card.json` identity and `MCP`/`Agent` APIs ready for AI agent discovery and interaction.
+- **SIWE Integration**: Players sign their scores securely before recording them.
+- **Cyberpunk Aesthetic**: High-energy neon visuals, immersive particle effects, and a highly responsive `canvas` engine.
 
-## Run Locally
+## Tech Stack
+- Frontend: React + TypeScript + Tailwind CSS + Framer Motion
+- Web3: Wagmi + Viem
+- AI Agent Standard: ERC-8004 + MCP
 
-**Prerequisites:**  Node.js
+## Agent Configuration
+The application is pre-configured with agent endpoints and a well-known agent identity card (`agent-card.json`). The agent endpoints handle Model Context Protocol (MCP) and inter-agent queries seamlessly via `/api/mcp` and `/api/agent`.
 
+## Web3 Implementation Details
+- Uses transparent attribution for transaction submissions.
+- Built for EVM-compatible chains with optimized low-latency interactions.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Quick Start
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Run local development server: `npm run dev`
+
+## Deployment
+This project is configured for Vercel deployment. Link your repository and Vercel will automatically build the environment. Ensure appropriate environment variables are set in production if any custom configurations are added later.
