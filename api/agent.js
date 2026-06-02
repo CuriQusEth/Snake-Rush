@@ -1,8 +1,6 @@
-import { NextResponse } from 'next/server';
-
-export async function GET() {
-  return NextResponse.json(
-    {
+export default function handler(req, res) {
+  if (req.method === 'GET') {
+    return res.status(200).json({
       name: "Snake Rush Plum Orchestrator",
       status: "active",
       wallet: "0x29536D0bc1004ab274c4F0F59734Ad74D4559b7B",
@@ -24,22 +22,13 @@ export async function GET() {
         { name: "optimize_speed", description: "Optimize snake speed and automation parameters" },
         { name: "get_track_info", description: "Get current arena track and hazard information" }
       ]
-    },
-    {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }
-    }
-  );
-}
+    });
+  }
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    return NextResponse.json(
-      {
+  if (req.method === 'POST') {
+    try {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      return res.status(200).json({
         name: "Snake Rush Plum Orchestrator",
         status: "active",
         wallet: "0x29536D0bc1004ab274c4F0F59734Ad74D4559b7B",
@@ -47,35 +36,11 @@ export async function POST(req: Request) {
         version: "1.0.0",
         message: "Agent endpoint parsed POST body successfully",
         payload: body
-      },
-      {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid Request" },
-      { 
-        status: 400,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        } 
-      }
-    );
+      });
+    } catch (error) {
+      return res.status(400).json({ error: "Invalid Request" });
+    }
   }
-}
 
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+  return res.status(405).json({ error: "Method not allowed" });
 }
