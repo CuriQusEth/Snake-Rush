@@ -4,7 +4,7 @@ import { parseEther } from 'viem';
 import { formatAttributionMessage, ATTRIBUTION_CODE, BUILDER_CODE } from '../lib/erc8021';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameCanvas } from './GameCanvas';
-import { Loader2, Trophy, Wallet, Zap, ShieldAlert } from 'lucide-react';
+import { Loader2, Trophy, Wallet, Zap, ShieldAlert, Sun } from 'lucide-react';
 
 export const MainApp = () => {
     const { address, isConnected } = useAccount();
@@ -25,10 +25,9 @@ export const MainApp = () => {
 
     const handleSayGM = () => {
       if (!address) return;
-      const dataStr = formatAttributionMessage("Say GM via Snake Rush");
-      // Converts string to hex logic would happen here for real ERC-8021 payload, sending 0 eth for popup.
+      // Sends a transaction to the contract 0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3
       sendTransaction({
-        to: address,
+        to: '0xcD0dd3716C5561De47a24949335dF8a8CD8F71a3',
         value: parseEther('0'),
       });
     };
@@ -84,8 +83,8 @@ export const MainApp = () => {
                         <div className="hidden md:block px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-mono tracking-widest">
                             BASE MAINNET • CONNECTED [{address?.slice(0, 6)}...{address?.slice(-4)}]
                         </div>
-                        <button onClick={handleSayGM} className="px-4 py-2 bg-white text-black font-bold text-xs uppercase tracking-widest rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                           GM TX
+                        <button onClick={handleSayGM} className="px-3 py-2 rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold">
+                           <Sun size={14} /> Say GM
                         </button>
                         <button onClick={() => disconnect()} className="px-3 py-1.5 text-[10px] uppercase font-bold text-red-500 hover:text-red-400 transition-colors tracking-widest">
                            DISCONNECT
@@ -204,10 +203,15 @@ export const MainApp = () => {
                           </button>
 
                           {isConnected ? (
-                             <button onClick={handleSignScore} className="group relative overflow-hidden w-full bg-purple-900/40 border border-purple-500 text-purple-300 py-3 text-sm font-bold uppercase hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.8)] mt-4">
-                                <div className="absolute inset-0 bg-purple-500/20 translate-y-full group-hover:translate-y-0 transition-transform -z-10"></div>
-                                Record Rush On-Chain
-                             </button>
+                             <div className="flex flex-col gap-2 mt-4">
+                                <button onClick={handleSignScore} className="group relative overflow-hidden w-full bg-purple-900/40 border border-purple-500 text-purple-300 py-3 text-sm font-bold uppercase hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.8)]">
+                                   <div className="absolute inset-0 bg-purple-500/20 translate-y-full group-hover:translate-y-0 transition-transform -z-10"></div>
+                                   Record Rush On-Chain
+                                </button>
+                                <button onClick={handleSayGM} className="px-3 py-2 justify-center rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold w-full">
+                                   <Sun size={14} /> Say GM
+                                </button>
+                             </div>
                           ) : (
                              <div className="mt-4 p-4 border border-yellow-500/20 bg-yellow-500/5 text-yellow-500/70 text-xs">
                                 Connect wallet to submit on-chain scores
