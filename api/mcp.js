@@ -2,21 +2,28 @@ export default function handler(req, res) {
   if (req.method === 'GET') {
     return res.status(200).json({
       protocol: "MCP",
-      version: "1.0.0",
+      version: "1.0.5",
       name: "Snake Rush Plum MCP Endpoint",
       status: "active",
-      description: "Active MCP server for Snake Rush Plum Orchestrator Agent",
+      network: "Base Mainnet",
+      upgrade: "Denim",
+      blockTime: "200ms",
+      chainId: 8453,
+      description: "Active MCP server for Snake Rush Plum Orchestrator Agent on Base Mainnet Denim",
       capabilities: [
         "snake-rush-mechanics",
         "fast-paced-automation",
-        "plum-collection"
+        "plum-collection",
+        "base-denim-200ms-execution",
+        "canonical-block-sync"
       ],
       skills: [
         { name: "get_race_status", description: "Get the current status of the Snake Rush race" },
         { name: "start_race", description: "Initialize and start a new Snake Rush race" },
         { name: "get_leaderboard", description: "Retrieve the current top rushers leaderboard" },
         { name: "optimize_speed", description: "Optimize snake speed and automation parameters" },
-        { name: "get_track_info", description: "Get current arena track and hazard information" }
+        { name: "get_track_info", description: "Get current arena track and hazard information" },
+        { name: "get_network_info", description: "Get Base Mainnet Denim network and 200ms block metrics" }
       ],
       timestamp: new Date().toISOString()
     });
@@ -34,7 +41,9 @@ export default function handler(req, res) {
           protocolVersion: "2024-11-05",
           serverInfo: {
             name: "Snake Rush Plum Orchestrator",
-            version: "1.0.0",
+            version: "1.0.5",
+            network: "Base Mainnet Denim",
+            blockTimeMs: 200
           },
           capabilities: {
             tools: {},
@@ -69,6 +78,11 @@ export default function handler(req, res) {
               name: "get_track_info",
               description: "Get current arena track and hazard information",
               inputSchema: { type: "object", properties: {} }
+            },
+            {
+              name: "get_network_info",
+              description: "Get Base Mainnet Denim network and 200ms block metrics",
+              inputSchema: { type: "object", properties: {} }
             }
           ]
         };
@@ -90,6 +104,22 @@ export default function handler(req, res) {
           case "get_track_info":
             result = { content: [{ type: "text", text: "Track Info: Standard Arena" }] };
             break;
+          case "get_network_info":
+            result = { 
+              content: [{ 
+                type: "text", 
+                text: JSON.stringify({
+                  network: "Base Mainnet",
+                  upgrade: "Denim",
+                  chainId: 8453,
+                  blockTimeMs: 200,
+                  canonicalBlocks: true,
+                  flashblocksRetired: true,
+                  rpc: "https://mainnet.base.org"
+                }) 
+              }] 
+            };
+            break;
           default:
             return res.status(404).json({ error: `Tool not found: ${toolName}` });
         }
@@ -102,6 +132,7 @@ export default function handler(req, res) {
           status: "success",
           message: "MCP command received",
           agent: "Snake Rush Plum Orchestrator",
+          network: "Base Mainnet Denim",
           receivedAt: new Date().toISOString(),
           payload: body
         };

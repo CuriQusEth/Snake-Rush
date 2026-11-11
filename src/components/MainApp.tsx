@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { useAccount, useConnect, useDisconnect, useSendTransaction, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useSendTransaction, useSignMessage, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { formatAttributionMessage, ATTRIBUTION_CODE, BUILDER_CODE } from '../lib/erc8021';
+import { BASE_DENIM_CONFIG } from '../lib/denim';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GameCanvas } from './GameCanvas';
-import { Loader2, Trophy, Wallet, Zap, ShieldAlert, Sun } from 'lucide-react';
+import { Loader2, Trophy, Wallet, Zap, ShieldAlert, Sun, CheckCircle2 } from 'lucide-react';
 
 export const MainApp = () => {
     const { address, isConnected } = useAccount();
     const { connectors, connect, isPending } = useConnect();
     const { disconnect } = useDisconnect();
-    const { sendTransaction } = useSendTransaction();
+    const { data: txHash, sendTransaction, isPending: isTxPending } = useSendTransaction();
+    const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ 
+      hash: txHash,
+      pollingInterval: BASE_DENIM_CONFIG.blockTimeMs, // 200ms polling for Denim
+    });
     const { signMessageAsync } = useSignMessage();
     
     const [gameState, setGameState] = useState<'menu' | 'playing' | 'gameover' | 'leaderboard'>('menu');
@@ -79,9 +84,13 @@ export const MainApp = () => {
                      ))}
                    </div>
                 ) : (
-                    <div className="flex gap-3 md:gap-6 items-center">
+                    <div className="flex gap-2 sm:gap-4 items-center">
+                        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full border border-cyan-500/40 bg-cyan-950/40 text-cyan-300 text-[11px] font-mono">
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                            <span>DENIM: 200ms BLOCKS</span>
+                        </div>
                         <div className="hidden md:block px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-mono tracking-widest">
-                            BASE MAINNET • CONNECTED [{address?.slice(0, 6)}...{address?.slice(-4)}]
+                            BASE MAINNET • DENIM (200ms) [{address?.slice(0, 6)}...{address?.slice(-4)}]
                         </div>
                         <button onClick={handleSayGM} className="px-3 py-2 rounded-lg bg-[#E8A020]/20 hover:bg-[#E8A020]/30 border border-[#E8A020]/40 text-[#E8A020] transition-colors flex items-center gap-2 font-['Cinzel'] text-xs font-bold">
                            <Sun size={14} /> Say GM
@@ -93,6 +102,36 @@ export const MainApp = () => {
                 )}
              </div>
           </header>
+
+          {/* Denim 200ms Transaction Notification */}
+          {(isTxPending || isConfirming || isConfirmed) && (
+            <div className="bg-gradient-to-r from-cyan-950/90 via-black to-purple-950/90 border-b border-cyan-500/30 px-4 py-2 flex items-center justify-between text-xs font-mono z-50">
+              <div className="flex items-center gap-2">
+                {isConfirmed ? (
+                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                )}
+                <span>
+                  {isConfirmed
+                    ? "Confirmed on Base Mainnet (Denim 200ms block)!"
+                    : isConfirming
+                    ? "Waiting for 200ms Denim block confirmation..."
+                    : "Broadcasting transaction to Base Mainnet..."}
+                </span>
+              </div>
+              {txHash && (
+                <a
+                  href={`https://basescan.org/tx/${txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-cyan-400 underline hover:text-cyan-200"
+                >
+                  View on BaseScan
+                </a>
+              )}
+            </div>
+          )}
 
           <main className="flex-1 flex overflow-hidden relative z-40">
             <div className="flex-1 relative bg-[#080808] border-r border-white/5 flex flex-col overflow-hidden">
@@ -271,7 +310,16 @@ export const MainApp = () => {
                   </div>
                 </section>
 
-                <section className="pt-4 border-t border-white/5">
+                <section className="pt-4 border-t border-white/5 space-y-3">
+                   <div className="bg-gradient-to-br from-cyan-950/30 to-black p-4 rounded-xl border border-cyan-500/20">
+                     <div className="flex items-center justify-between mb-2">
+                       <span className="text-[10px] text-cyan-400 font-bold tracking-wider uppercase">Base Denim Upgrade</span>
+                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                     </div>
+                     <p className="text-[11px] text-white/80 font-mono">200ms Canonical Blocks</p>
+                     <p className="text-[9px] text-white/40 mt-1">Sub-second execution • Flashblocks retired</p>
+                   </div>
+
                    <div className="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl border border-white/10">
                      <p className="text-[9px] text-white/40 uppercase tracking-widest mb-1">Builder Reference</p>
                      <p className="text-[11px] font-mono text-cyan-500 truncate">{BUILDER_CODE}</p>
@@ -291,12 +339,15 @@ export const MainApp = () => {
           </main>
 
           <footer className="h-10 px-4 md:px-8 bg-[#111] flex items-center justify-between border-t border-white/5 text-[10px] uppercase font-bold tracking-widest text-white/40 relative z-50">
-            <div className="flex gap-4 md:gap-8">
-              <span className="hidden sm:inline">Version: 1.0.4-RUSH</span>
-              <span className="text-cyan-500/60 font-mono">Latency: 14ms</span>
+            <div className="flex gap-4 md:gap-8 items-center">
+              <span className="hidden sm:inline">Version: 1.0.5-DENIM</span>
+              <span className="text-cyan-400 font-mono flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                Denim: 200ms Blocks
+              </span>
             </div>
             <div className="flex gap-4">
-              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500"></div> Network: Base</span>
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-green-500"></div> Network: Base Mainnet</span>
               <span className="hidden sm:inline">Powered by ERC-8004</span>
             </div>
           </footer>
